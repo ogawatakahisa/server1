@@ -8,7 +8,7 @@ import cors from "cors"
 const app: Express = express();
 const PORT = 8080;
 
-// ミドルウェア設定
+// ミドルウェアの設定
 // リクエストとレスポンスの間
 // すべてのリクエストで毎回実行される処理をかける
 app.use(express.json()) //Json形式を使いますよ
