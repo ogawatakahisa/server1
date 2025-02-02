@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon --exec node --no-warnings=ExperimentalWarning --loader ts-node/esm src/index.ts",
+    "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm src/index.ts",
     "build": "echo 'Skipping build step for backend server1'"
+
   },
   "keywords": [],
   "author": "",
