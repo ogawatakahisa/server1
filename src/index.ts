@@ -1,77 +1,107 @@
 import express from "express";
 import type { Express, Request, Response } from "express";
-import {PrismaClient} from "@prisma/client"
-import cors from "cors"
+import { PrismaClient } from "@prisma/client";
+import cors from "cors";
+import { authenticate } from "./middleware/auth.js"; // 認証ミドルウェアを適用
 
 const app: Express = express();
 const PORT = 8080;
 
 // ミドルウェアの設定
-app.use(express.json()) // json形式でデータを扱う 
-app.use(cors()); // corsを許可
+app.use(express.json()); // リクエストのボディを JSON 形式でパース
+app.use(cors({
+    origin: "http://localhost:3000", // フロントエンドのURLを指定（CORS設定）
+    // origin: true, // フロントエンドのURLを指定（CORS設定）
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // クッキー・認証情報を含める場合は true に設定
+}));
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient();// DBとの接続を管理（インスタンス作成）
+app.use(authenticate);// 認証ミドルウェアを適用（すべてのエンドポイントで認証をチェック）
 
-// GET /allTodos: 全てのtodoアイテムを取得
+/**
+ * GET /allTodos
+ * ユーザーの全ての Todo アイテムを取得する
+ */
 app.get("/allTodos", async (req: Request, res: Response): Promise<void> => {
     try {
-        // Prismaを使用してDBからtodoリストを取得
-        const allTodos = await prisma.todo.findMany();
-        res.json(allTodos)
+        const userId = req.body.user.sub; // ユーザーIDを取得
+        const allTodos = await prisma.todo.findMany({
+            where: { userId }, // ユーザーごとのTodoを取得
+        });
+        res.json(allTodos);
     } catch (error) {
-        res.status(500).json({ error: "Error fetching Todos" }); // エラー処理
+        res.status(500).json({ error: "Error fetching Todos" });
     }
 });
 
-// POST /createTodo: 新しいTodo項目を作成
-app.post("/createTodo", async(req: Request, res: Response): Promise<void> => {
+/**
+ * POST /createTodo
+ * 新しい Todo アイテムを作成する
+ */
+app.post("/createTodo", async (req: Request, res: Response): Promise<void> => {
     try {
         const { title, isCompleted } = req.body;
-        
-        // 新しいtodo項目を作成
+        const userId = req.body.user.sub; // ユーザーIDを取得
+
         const createTodos = await prisma.todo.create({
             data: {
                 title,
                 isCompleted,
-            }
+                userId,
+            },
         });
-        res.json(createTodos)
+        res.json(createTodos);
     } catch (error) {
         res.status(500).json(error);
     }
 });
-// put /editTodo/:id: 指定されたIDのTodo項目を更新
-app.put("/editTodo/:id", async(req: Request, res: Response): Promise<void> => {
+
+/**
+ * PUT /editTodo/:id
+ * 指定されたIDの Todo アイテムを更新する
+ */
+app.put("/editTodo/:id", async (req: Request, res: Response): Promise<void> => {
     try {
-        const id = Number(req.params.id);// URLパラメータからIDを取得
+        const id = Number(req.params.id); // URLパラメータからTodoのIDを取得
         const { title, isCompleted } = req.body;
+        const userId = req.body.user.sub; // ユーザーIDを取得
+
         // Todoアイテムを更新
         const editTodo = await prisma.todo.update({
-            where: {id},
+            where: { id, userId }, // ユーザーごとのデータを更新
             data: {
                 title,
                 isCompleted,
-            }
+            },
         });
-        res.json(editTodo); // 更新したtodoアイテムを返す
+        res.json(editTodo); // 更新後のTodoを返す
     } catch (error) {
         res.status(400).json(error);
     }
 });
 
-// DELETE /deleteTodo/:id: 指定されたIDのTodo項目を削除
-app.delete("/deleteTodo/:id", async(req: Request, res: Response): Promise<void> => {
+/**
+ * DELETE /deleteTodo/:id
+ * 指定されたIDの Todo アイテムを削除する
+ */
+app.delete("/deleteTodo/:id", async (req: Request, res: Response): Promise<void> => {
     try {
-        const id = Number(req.params.id);
+        const id = Number(req.params.id); // URLパラメータからIDを取得
+        const userId = req.body.user.sub; // ユーザーIDを取得
+
         // Todoアイテムを削除
         const deleteTodos = await prisma.todo.delete({
-            where: {id},
+            where: { id, userId }, // ユーザーごとのデータを削除
         });
-        res.json(deleteTodos)
+        res.json(deleteTodos);
     } catch (error) {
         res.status(400).json(error);
     }
 });
 
-// サーバを指定したポートで起動
-app.listen(PORT, () => console.log("server is runnning"))
+/**
+ * サーバーを指定したポートで起動
+ */
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
