@@ -97,11 +97,6 @@ http://localhost:8080で動作します。
 
 
 
-## 認証（AWS Cognito）
-このアプリではAWS CognitoによるJWT認証を利用しています。
-apiを利用する際は、リクエストのAuthorizationヘッダーにBearer {token}を付与してください。
-
-
 ## 関連リポジトリ
 
 ・フロントエンドリポジトリ：[todo-client)](https://github.com/ogawatakahisa/todo-client.git)
