@@ -27,16 +27,14 @@ app.use(authenticate);// 認証ミドルウェアを適用（すべてのエン�
 app.get("/allTodos/:date", async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.body.user?.sub;
-        const dateParam = req.params.date; // `YYYY-MM-DD` 形式で受け取る
-        console.log("Received Date Param:", dateParam);
-        console.log("Received User ID:", userId);
+        // const dateParam = req.params.date; // `YYYY-MM-DD` 形式で受け取る
 
         // `date` が startDate 以上かつ endDate 以下のものを取得
         const allTodos = await prisma.todo.findMany({
             where: {
                 userId,
 
-                date: dateParam,
+                // date: dateParam,
             },
         });
 
@@ -66,7 +64,7 @@ app.post("/createTodo", async (req: Request, res: Response): Promise<void> => {
                 title,
                 isCompleted,
                 userId,
-                date: date, // `YYYY-MM-DD` を `Date` に変換
+                // date: date, // `YYYY-MM-DD` を `Date` に変換
             },
         });
         res.json(createTodos);
@@ -91,7 +89,7 @@ app.put("/editTodo/:id", async (req: Request, res: Response): Promise<void> => {
             data: {
                 title,
                 isCompleted,
-                date: date ? date : undefined, // `date` がある場合のみ更新
+                // date: date ? date : undefined, // `date` がある場合のみ更新
             },
         });
         res.json(editTodo); // 更新後のTodoを返す

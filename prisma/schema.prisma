@@ -12,5 +12,5 @@ model Todo {
   title       String
   isCompleted Boolean @default(false)
   userId      String
-  date        String  @default("")
+  // date        String  @default("")
 }
