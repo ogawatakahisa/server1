@@ -24,7 +24,7 @@ app.use(authenticate);// 認証ミドルウェアを適用（すべてのエン�
  * GET /allTodos
  * ユーザーごと日付ごとの Todo アイテムを取得する
  */
-app.get("/allTodos/:date", async (req: Request, res: Response): Promise<void> => {
+app.get("/allTodos", async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.body.user?.sub;
         // const dateParam = req.params.date; // `YYYY-MM-DD` 形式で受け取る
@@ -33,8 +33,6 @@ app.get("/allTodos/:date", async (req: Request, res: Response): Promise<void> =>
         const allTodos = await prisma.todo.findMany({
             where: {
                 userId,
-
-                // date: dateParam,
             },
         });
 
