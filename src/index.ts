@@ -10,7 +10,7 @@ const PORT = 8080;
 // ミドルウェアの設定
 app.use(express.json()); // リクエストのボディを JSON 形式でパース
 app.use(cors({
-    // origin: "http://localhost:3000", // フロントエンドのURLを指定（CORS設定）
+    origin: "http://localhost:3000", // フロントエンドのURLを指定（CORS設定）
     // origin: true, // フロントエンドのURLを指定（CORS設定）
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -22,16 +22,28 @@ app.use(authenticate);// 認証ミドルウェアを適用（すべてのエン�
 
 /**
  * GET /allTodos
- * ユーザーの全ての Todo アイテムを取得する
+ * ユーザーごと日付ごとの Todo アイテムを取得する
  */
-app.get("/allTodos", async (req: Request, res: Response): Promise<void> => {
+app.get("/allTodos/:date", async (req: Request, res: Response): Promise<void> => {
     try {
-        const userId = req.body.user.sub; // ユーザーIDを取得
+        const userId = req.body.user?.sub;
+        const dateParam = req.params.date; // `YYYY-MM-DD` 形式で受け取る
+        console.log("Received Date Param:", dateParam);
+        console.log("Received User ID:", userId);
+
+        // `date` が startDate 以上かつ endDate 以下のものを取得
         const allTodos = await prisma.todo.findMany({
-            where: { userId }, // ユーザーごとのTodoを取得
+            where: {
+                userId,
+
+                date: dateParam,
+            },
         });
+
+        console.log("Found Todos:", allTodos);
         res.json(allTodos);
     } catch (error) {
+        console.error("Error fetching todos:", error);
         res.status(500).json({ error: "Error fetching Todos" });
     }
 });
@@ -42,14 +54,19 @@ app.get("/allTodos", async (req: Request, res: Response): Promise<void> => {
  */
 app.post("/createTodo", async (req: Request, res: Response): Promise<void> => {
     try {
-        const { title, isCompleted } = req.body;
+        const { title, isCompleted, date } = req.body;
         const userId = req.body.user.sub; // ユーザーIDを取得
+
+        if (!date) {
+            res.status(400).json({ error: "Date is required" });
+        }
 
         const createTodos = await prisma.todo.create({
             data: {
                 title,
                 isCompleted,
                 userId,
+                date: date, // `YYYY-MM-DD` を `Date` に変換
             },
         });
         res.json(createTodos);
@@ -65,7 +82,7 @@ app.post("/createTodo", async (req: Request, res: Response): Promise<void> => {
 app.put("/editTodo/:id", async (req: Request, res: Response): Promise<void> => {
     try {
         const id = Number(req.params.id); // URLパラメータからTodoのIDを取得
-        const { title, isCompleted } = req.body;
+        const { title, isCompleted, date } = req.body;
         const userId = req.body.user.sub; // ユーザーIDを取得
 
         // Todoアイテムを更新
@@ -74,6 +91,7 @@ app.put("/editTodo/:id", async (req: Request, res: Response): Promise<void> => {
             data: {
                 title,
                 isCompleted,
+                date: date ? date : undefined, // `date` がある場合のみ更新
             },
         });
         res.json(editTodo); // 更新後のTodoを返す
