@@ -7,11 +7,13 @@ import { authenticate } from "./middleware/auth.js"; // 認証ミドルウェア
 const app: Express = express();
 const PORT = 8080;
 
+
 // ミドルウェアの設定
 app.use(express.json()); // リクエストのボディを JSON 形式でパース
 app.use(cors({
     // origin: "http://localhost:3000", // フロントエンドのURLを指定（CORS設定）
-    origin: true, // フロントエンドのURLを指定（CORS設定）
+    origin: "https://main.dyjd4es3l5pg4.amplifyapp.com", // フロントエンドのURLを指定（CORS設定）
+    // origin: true, // フロントエンドのURLを指定（CORS設定）
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // クッキー・認証情報を含める場合は true に設定
