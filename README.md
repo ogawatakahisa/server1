@@ -43,6 +43,7 @@ npm install
 ```
 
 ## 環境変数を設定
+.env ファイルを作成し、以下の内容を追加:
 
 ```bash
 DATABASE_URL="file:./dev.db"
