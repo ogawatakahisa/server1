@@ -47,8 +47,6 @@ npm install
 
 ```bash
 DATABASE_URL="file:./dev.db"
-JWT_SECRET=your_secret_key
-API_PORT=8080
 AWS_COGNITO_USER_POOL_ID=your_cognito_user_pool_id
 AWS_COGNITO_CLIENT_ID=your_cognito_client_id
 ```
