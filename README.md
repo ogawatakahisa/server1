@@ -80,6 +80,23 @@ http://localhost:8080で動作します。
 | DELETE | /deeteTodo/:id | Todoを削除 |
 
 
+## AWSへのデプロイ
+1. AWS App Runnerで新しいサービスを作成
+2. リポジトリタイプ＝ソースコードリポジトリ
+3. プロバイダー＝GitHub
+4. ソースディレクトリ＝/src
+5. デプロイ＝自動
+6. 設定ファイル＝ここで全ての設定を構成する
+7. ランタイム＝Node.js 16
+8. 構築コマンド＝npm install
+9. 開始コマンド＝npm run dev
+10. 環境変数＝DATABASE_URL
+11. 環境変数の値＝"file:./dev.db"
+12. 環境変数 (DATABASE_URL, AWS_COGNITO_USER_POOL_ID など) を設定
+13. デプロイを実行
+
+
+
 ## 認証（AWS Cognito）
 このアプリではAWS CognitoによるJWT認証を利用しています。
 apiを利用する際は、リクエストのAuthorizationヘッダーにBearer {token}を付与してください。
