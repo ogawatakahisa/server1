@@ -47,8 +47,8 @@ npm install
 
 ```bash
 DATABASE_URL="file:./dev.db"
-AWS_COGNITO_USER_POOL_ID=your_cognito_user_pool_id
-AWS_COGNITO_CLIENT_ID=your_cognito_client_id
+COGNITO_USER_POOL_ID=your_cognito_user_pool_id
+COGNITO_CLIENT_ID=your_cognito_client_id
 ```
 .env.example を用意し、環境変数のテンプレートを提供しておくと親切。
 
